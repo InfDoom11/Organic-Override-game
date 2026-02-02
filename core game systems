@@ -1,0 +1,148 @@
+"""Core game systems and top-level game container.
+
+`Game` holds the main state for the prototype: player, enemies, HUD,
+and the basic update/draw loop hooks used by `main.py`.
+"""
+
+import pygame
+import json
+import os
+from .player import Player
+from .ui import HUD
+
+
+class Game:
+    """Top-level container for game state and systems.
+
+    The `Game` class handles spawning simple placeholder enemies,
+    routing player input (polled), performing collisions and basic
+    combat resolution, drawing the world and saving/loading basic
+    persistent state.
+    """
+
+    def __init__(self, screen):
+        # Graphics surface and dimensions
+        self.screen = screen
+        self.width, self.height = screen.get_size()
+
+        # Gameplay objects
+        self.player = Player(100, 250)
+        self.hud = HUD(self.player)
+        self.bg_color = (30, 30, 40)
+
+        # Simple enemy list; spawn one for demonstration
+        self.enemies = []
+        self.spawn_enemy()
+
+        # Save file location (relative to package)
+        self.save_path = os.path.join(os.path.dirname(__file__), '..', 'save.json')
+        self.load()
+
+    def spawn_enemy(self):
+        """Create a simple enemy as a dict with rect, velocity and health.
+
+        This is a placeholder stub to demonstrate collisions and damage.
+        """
+        e = {'rect': pygame.Rect(600, 260, 50, 60), 'vel': -60, 'health': 30}
+        self.enemies.append(e)
+
+    def update(self, dt):
+        """Advance game state: handle input, update player and enemies.
+
+        Input actions (attack, dodge, parry, throw) are polled here and
+        forwarded to the `Player` methods. Enemy movement and simple
+        collision resolution are performed in this method as well.
+        """
+        keys = pygame.key.get_pressed()
+        self.player.handle_input(keys, dt)
+
+        # Map keys to player actions (simple control scheme)
+        if keys[pygame.K_z]:
+            self.player.attack()
+        if keys[pygame.K_x]:
+            self.player.dodge()
+        if keys[pygame.K_c]:
+            self.player.parry()
+        if keys[pygame.K_v]:
+            self.player.throw()
+
+        # Update the player timers and projectiles
+        self.player.update(dt)
+
+        # Update enemies and check collisions with the player
+        for e in list(self.enemies):
+            e['rect'].x += int(e['vel'] * dt)
+
+            # Basic collision handling: damage, parry reflect or enemy hurt
+            if e['rect'].colliderect(self.player.rect):
+                if not self.player.invulnerable:
+                    if self.player.is_parrying:
+                        # Successful parry reflects enemy direction
+                        e['vel'] *= -1
+                    elif self.player.is_attacking:
+                        # Attacking damages the enemy
+                        e['health'] -= 25
+                        if e['health'] <= 0:
+                            self.enemies.remove(e)
+                    else:
+                        # Default: player takes damage
+                        self.player.health -= 10
+
+        # Projectiles can hit enemies; apply damage and remove projectiles
+        for p in list(self.player.projectiles):
+            for e in list(self.enemies):
+                if p['rect'].colliderect(e['rect']):
+                    e['health'] -= 20
+                    if e['health'] <= 0:
+                        self.enemies.remove(e)
+                    try:
+                        self.player.projectiles.remove(p)
+                    except ValueError:
+                        pass
+
+    def draw(self):
+        """Render the world, player, enemies and UI.
+
+        Currently this draws a simple grid, placeholder rectangles for
+        entities and delegates HUD drawing to the `HUD` class.
+        """
+        self.screen.fill(self.bg_color)
+
+        # Optional grid to hint at an explorable space during prototyping
+        for x in range(0, self.width, 64):
+            pygame.draw.line(self.screen, (20, 20, 30), (x, 0), (x, self.height))
+
+        # Draw player and enemies
+        self.player.draw(self.screen)
+
+        for e in self.enemies:
+            pygame.draw.rect(self.screen, (180, 80, 80), e['rect'])
+
+        # Draw HUD on top of the scene
+        self.hud.draw(self.screen)
+
+    def save(self):
+        """Persist minimal state to a JSON save file.
+
+        This demo saves only the player's health. In a full game the
+        save would include position, inventory, story flags, etc.
+        """
+        data = {
+            'player': {'health': self.player.health}
+        }
+        try:
+            with open(self.save_path, 'w') as f:
+                json.dump(data, f)
+        except Exception:
+            # Ignore save errors in this minimal prototype
+            pass
+
+    def load(self):
+        """Load previously saved state if available."""
+        try:
+            with open(self.save_path, 'r') as f:
+                data = json.load(f)
+                self.player.health = data.get('player', {}).get('health', self.player.health)
+        except Exception:
+            # No save or parse error — continue with defaults
+            pass
