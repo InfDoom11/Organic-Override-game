@@ -1,14 +1,16 @@
 """
+Renamed to be app.py
 Main entrypoint for the Mythic Prototype.
 
 This file initializes Pygame, creates the game instance and runs the
 main loop. The loop calculates a delta-time (`dt`) each frame, handles
 the quit event, updates game logic and then draws the frame.
 """
+"Typically, the main file to run the application is called app."
 
 import pygame
 import sys
-from game.core import Game
+from Core/Entities/ import GameState
 
 
 def main():
@@ -25,7 +27,7 @@ def main():
     clock = pygame.time.Clock()
 
     # Create the main game object which holds state and systems
-    game = Game(screen)
+    game = GameState(screen)
 
     # Main game loop
     while True:
