@@ -8,8 +8,9 @@ and parry frames) which are common mechanics in skill-based combat.
 
 import pygame
 import math
+from .player import Player
 
-
+#should inherit Player thats coming from pygame
 class Player:
     """Represents the player entity and its combat/movement state.
 
