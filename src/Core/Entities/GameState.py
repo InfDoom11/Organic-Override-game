@@ -8,10 +8,17 @@ import pygame
 import json
 import os
 from .ui import HUD
-from game.core import Game
+from Infrastructure.Factories import PlayerFactory
+from Infrastructure.Factories.EnemyFactory import EnemyFactory
+from .Player import Player
+from .Enemy import Enemy
+from .HUD import HUD
+from .GameLevel import GameLevel
+from .Services.SpawnService import SpawnService
+from .Services.CommandService import CommandService
 
 #Should inherit from Game so that it retains all its properties from pygame
-class Game:
+class GameState:
     """This is the Game state 
 
     On Initiation it will render the canvas and get populated with relevant entities
@@ -21,19 +28,22 @@ class Game:
     combat resolution, drawing the world and saving/loading basic
     persistent state.
     """
-
     def __init__(self, screen):
         # Graphics surface and dimensions
         self.screen = screen
         self.width, self.height = screen.get_size()
-
-        RenderEntities()
+        self.bg_color = (10, 10, 15)
+        
+        # Initialize entities
+        self.player = PlayerFactory.CreatePlayer(100, 300)
+        self.enemy = EnemyFactory.CreateEnemy(1)
+        self.hud = HUD(self.player)
+        self.enemies = []
 
         # Save file location (relative to package)
         self.save_path = os.path.join(os.path.dirname(__file__), '..', 'save.json')
         self.load()
 
-    
     def update(self, dt):
         """Advance game state: handle input, update player and enemies.
 
@@ -43,9 +53,9 @@ class Game:
         """
         #I abstracted this again because its a really important functionality and should
         #be separated for better control
-        CommandService.FirePlayerCommands()    
+        CommandService.FirePlayerCommands(self.player, dt)    
         #Also abstracted here as well    
-        HandleCollisions()       
+        self.handle_collisions(dt)       
 
     def draw(self):
         """Render the world, player, enemies and UI.
@@ -99,21 +109,9 @@ class Game:
             # No save or parse error — continue with defaults
             pass
 
-    #method made to abstract populating the world with entities
-    #Necessary because as the development progress gets more complex, abstraction 
-    #becomes not only our best tool, but our saving grace
-    def RenderEntities():
-        # Gameplay objects
-        self.player = SpawnServicePlayer.spawn_Player(100, 250)
-        self.hud = HUD(self.player)
-        self.bg_color = (30, 30, 40)
-
-        # Simple enemy list; spawn one for demonstration
-        #Changed this to match what we are working with
-        self.enemies = SpawnService.spawn_Enemies()
-    #method to abstract collision handling
-    def HandleCollisions():
-         # Updates enemies and check collisions with the player
+    def handle_collisions(self, dt):
+        """Handle collision detection and resolution between player, enemies and projectiles."""
+        # Updates enemies and check collisions with the player
         for e in list(self.enemies):
             e['rect'].x += int(e['vel'] * dt)
 
@@ -131,10 +129,11 @@ class Game:
                     else:
                         # Default: player takes damage
                         self.player.health -= 10
-        HandleProjectileCollisions()
+        self.handle_projectile_collisions()
         self.player.update(dt)
-    #method to abstract the projectile collision handling 
-    def HandleProjectileCollisions():
+
+    def handle_projectile_collisions(self):
+        """Handle collision detection for projectiles against enemies."""
         # Projectiles can hit enemies; apply damage and remove projectiles
         for p in list(self.player.projectiles):
             for e in list(self.enemies):

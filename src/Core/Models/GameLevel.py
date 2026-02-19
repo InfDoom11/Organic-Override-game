@@ -2,4 +2,5 @@
  be in. I believed this made sense as a class because there is more to a GameLevel than
  a number. There could also be descriptions and other world rendering information"""
 class GameLevel:
-    number levelNumber
+    def __init__(self, levelNumber):
+        self.levelNumber = levelNumber

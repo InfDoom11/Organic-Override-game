@@ -11,7 +11,7 @@ for creating games."""
 import pygame
 
 
-class HUD:
+class  HUD:
     """Minimal HUD for the prototype.
 
     This class handles rendering simple UI elements like the player's
