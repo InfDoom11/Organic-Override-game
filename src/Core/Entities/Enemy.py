@@ -1,9 +1,14 @@
 #should inherit the class (maybe its called Object) that pygame uses, and has the function
 #update(dt)
+import pygame
 class Enemy:
-    def rect 
-    def vel
-    def health
+    def __init__(self, rect, vel, health):
+        self.rect = rect
+        self.vel = vel
+        self.health = health
+        self.color = (255, 0, 0)
+        self.is_attacking = False
+
     def draw(self, surface):
         """Render the enemy,and an attack arc 
 

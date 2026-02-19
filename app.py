@@ -10,7 +10,7 @@ the quit event, updates game logic and then draws the frame.
 
 import pygame
 import sys
-from Core/Entities/ import GameState
+from src.Core.Entities.GameState import GameState
 
 
 def main():
