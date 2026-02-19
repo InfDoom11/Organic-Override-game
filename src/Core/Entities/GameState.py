@@ -7,15 +7,14 @@ and the basic update/draw loop hooks used by `main.py`.
 import pygame
 import json
 import os
-from .ui import HUD
-from Infrastructure.Factories import PlayerFactory
-from Infrastructure.Factories.EnemyFactory import EnemyFactory
 from .Player import Player
 from .Enemy import Enemy
-from .HUD import HUD
-from .GameLevel import GameLevel
-from .Services.SpawnService import SpawnService
-from .Services.CommandService import CommandService
+from ..Models.HUD import HUD
+from ..Models.GameLevel import GameLevel
+from Infrastructure.Factories.PlayerFactory import PlayerFactory
+from Infrastructure.Factories.EnemyFactory import EnemyFactory
+from Infrastructure.Services.SpawnService import SpawnService
+from Infrastructure.Services.CommandService import CommandService
 
 #Should inherit from Game so that it retains all its properties from pygame
 class GameState:

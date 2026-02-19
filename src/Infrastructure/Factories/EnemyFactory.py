@@ -1,5 +1,5 @@
 import pygame
-from ...Core.Entities.Enemy import Enemy
+from Core.Entities.Enemy import Enemy
 
 class EnemyFactory:
     @staticmethod

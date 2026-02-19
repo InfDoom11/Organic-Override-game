@@ -1,5 +1,7 @@
-from ...Core.Entities.Enemy import Enemy
-from ...Core.Models.GameLevel import GameLevel
+from Core.Entities.Enemy import Enemy
+from Core.Models.GameLevel import GameLevel
+from Infrastructure.Factories.PlayerFactory import PlayerFactory
+from Infrastructure.Factories.EnemyFactory import EnemyFactory
 
 class SpawnService:
     def __init__(self, gameLevel):

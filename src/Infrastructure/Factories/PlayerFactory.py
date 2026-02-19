@@ -1,4 +1,4 @@
-from ...Core.Entities.Player import Player
+from Core.Entities.Player import Player
 
 class PlayerFactory:
     @staticmethod
