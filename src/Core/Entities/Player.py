@@ -9,7 +9,7 @@ and parry frames) which are common mechanics in skill-based combat.
 import pygame
 import math
 
-
+#should inherit Player thats coming from pygame
 class Player:
     """Represents the player entity and its combat/movement state.
 
@@ -97,8 +97,11 @@ class Player:
         """Spawn a simple forward projectile from the player's center."""
         px = self.rect.centerx
         py = self.rect.centery
-        proj = {"rect": pygame.Rect(px, py - 6, 12, 12), "vel": 500}
-        self.projectiles.append(proj)
+        projectile = {
+            'rect': pygame.Rect(px, py, 8, 8),
+            'vel': 400  # pixels/second
+        }
+        self.projectiles.append(projectile)
 
     def update(self, dt):
         """Update timers and move any active projectiles.

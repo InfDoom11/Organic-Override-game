@@ -1,7 +1,17 @@
+"""Lesson 1.
+
+Name the file the name of the class that you define in the file. Expections happen with
+functional programming or with an auxillary class that only the main class has access 
+to.
+This is industry practice for Object Oriented programming and that's the best approach
+for creating games."""
+
+"This file was initially render for simple UI elements"
+
 import pygame
 
 
-class HUD:
+class  HUD:
     """Minimal HUD for the prototype.
 
     This class handles rendering simple UI elements like the player's
